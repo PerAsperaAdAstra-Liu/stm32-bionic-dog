@@ -1,0 +1,42 @@
+# ===== Keil / 编译产物 =====
+Project/OBJ/
+Project/LIST/
+Project/DebugConfig/
+Project/RTE/
+*.o
+*.d
+*.axf
+*.hex
+*.map
+*.lst
+*.htm
+*.dep
+*.lnp
+*.sct
+*.iex
+*.dbgconf
+*.build_log.htm
+
+# 构建日志
+*.log
+
+# ===== PPT 生成工作区（第一版不纳入，含 node_modules 与大二进制）=====
+Slides/
+
+# ===== 一次性工具脚本（含本机绝对路径），仅保留 keilkill.bat =====
+Tools/*.py
+Tools/*.ps1
+
+# ===== Node / Python =====
+node_modules/
+__pycache__/
+*.pyc
+.codex-finalizer/
+
+# ===== 系统 / 编辑器 =====
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+.vscode/
+.idea/
