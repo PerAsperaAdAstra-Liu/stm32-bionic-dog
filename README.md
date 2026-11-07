@@ -30,8 +30,8 @@
 | `USER/SERVO/` | TIM4 四路 PWM 舵机驱动 + 动作库（起立/趴下/坐下/前进/后退） |
 | `USER/USART6/` | 串口 6 接收语音模块指令 |
 | `USER/OLED/` | OLED 软件 I2C 显示驱动（SSD1306/SSD1315 指令）+ `oled_picture.c` 表情资源 |
-| `Project/` | `Dog.uvprojx` Keil 工程 + 编译输出 `OBJ/`、`LIST/` |
-| `Tools/` | `gen_face.py`（生成表情数组）、`gen_project.py`（生成 Keil 工程）、`keilkill.bat` |
+| `Project/` | `Dog.uvprojx` Keil 工程；`OBJ/`、`LIST/` 为首次编译后自动生成，仓库不含 |
+| `Tools/` | 仅 `keilkill.bat`（清理编译产物）；表情 / 工程生成脚本不随仓库发布 |
 | `Docs/` | SU03T 配置清单、接线表、联调验证清单、指令映射表 |
 
 ## 二、编译与下载
@@ -56,7 +56,9 @@ RO 合计约 **15.5 KB**，Keil Lite 版 32KB 上限仍有充足余量。
 
 ## 三、首次上电顺序（重要）
 
-`Main/main.h` 里的 `DEBUG_MODE` 是分步自检开关，**第一次上电别直接跑正式模式**：
+`Main/main.h` 里的 `DEBUG_MODE` 是分步自检开关，**第一次上电别直接跑正式模式**。
+
+> **仓库默认 `DEBUG_MODE = 1`（自检模式），上电不会驱动未标定的舵机；完成舵机标定、确认无堵转后，再手动改成 0 进入正式模式。**
 
 | 值 | 含义 | 什么时候用 |
 |---|---|---|
@@ -86,7 +88,7 @@ RO 合计约 **15.5 KB**，Keil Lite 版 32KB 上限仍有充足余量。
 | 项目 | 参数 |
 |---|---|
 | 系统时钟 | HSE 8MHz → PLL → 168MHz |
-| TIM4 | PSC=840-1 → 100kHz；ARR=2000-1 → 20ms；CCR 50~250 → 0.5~2.5ms |
+| TIM4 | PSC=840-1 → 100kHz；ARR=2000-1 → 20ms；写入前限幅 CCR 60~240（0.6~2.4ms） |
 | 角度公式 | 左腿 `CCR = angle*50/45 + 50`；右腿 `CCR = 250 - angle*50/45`（先乘后除） |
 | 舵机速度 | 全局 `speed`：0=一步到位，数值越大越慢（每步延时 ms） |
 | 语音串口 | USART6，9600-8-1-无校验，帧格式 `AA 55 + 数据 + 55 AA` |
@@ -118,9 +120,9 @@ RO 合计约 **15.5 KB**，Keil Lite 版 32KB 上限仍有充足余量。
 3. 显示不对时改 `USER/OLED/oled.h` 里的开关：
    - 颜色黑白颠倒 → `OLED_PIC_INVERT` 改成 1
    - 图案上下颠倒 → `OLED_PIC_BIT_REVERSE` 改成 1
-   - 屏幕花屏/点不亮 → `OLED_I2C_SLOW` 改成 1（给软件 I2C 加延时）
+   - 屏幕花屏/点不亮 → `OLED_I2C_SPEED` 改成 2（给软件 I2C 加更多延时）
 
-也可以直接改 `Tools/gen_face.py` 里的画法，再运行 `python gen_face.py` 重新生成。
+> 注：原表情 / 工程生成脚本（`gen_face.py`、`gen_project.py`）含本机绝对路径，不随仓库发布；修改表情请按上面的取模流程手动替换数组。
 
 ## 八、与官方例程的两处差异（答辩可讲）
 
@@ -153,4 +155,4 @@ RO 合计约 **15.5 KB**，Keil Lite 版 32KB 上限仍有充足余量。
 
 - 舵机方向反 → 断电拆舵盘旋转 180° 重装（老师视频做法），或调整 `servo.h` 的公式
 - 步态幅度不合适 → 改 `servo.h` 里的 `GAIT_SWING`（默认 45°）
-- 摆动速度不合适 → 改 `GAIT_SPEED` 区间的 `SPEED_GAIT`（默认 3ms/步）
+- 摆动速度不合适 → 改 `servo.h` 里的 `SPEED_GAIT`（默认 3ms/步，数值越大越慢）

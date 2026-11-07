@@ -43,7 +43,7 @@ extern u8 speed;
 
 void Servo_Init(void);
 
-/* 直接设置比较值（50~250） */
+/* 直接设置比较值（内部按 SERVO_CCR_MIN/MAX 限幅 60~240） */
 void SetPWM_LB(u16 ccr);
 void SetPWM_RB(u16 ccr);
 void SetPWM_LF(u16 ccr);
